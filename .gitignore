@@ -1,0 +1,42 @@
+# virtual env
+codingplan/
+.venv/
+
+# local secrets
+.env
+**/.env
+
+# runtime data
+data/usage.json
+data/ui_state.json
+data/deepseek_daily.json
+data/*.tmp
+release/**/data/usage.json
+release/**/data/ui_state.json
+release/**/data/deepseek_daily.json
+
+# python cache
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# logs
+*.log
+
+# PyInstaller
+build/
+dist/
+release/
+*.spec
+!CodingPlanWidget.spec
+*.spec.bak
+
+# local/system
+.DS_Store
+Thumbs.db
+
+# sensitive files
+auth.json
+*auth.json*
+*token*
+*cookie*

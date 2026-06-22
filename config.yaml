@@ -1,0 +1,36 @@
+app:
+  refresh_interval_seconds: 180
+  cache_path: "data/usage.json"
+  timezone: "local"
+
+ui:
+  always_on_top: true
+  opacity: 0.92
+  width: 280
+  height: 300
+  collapsible: true
+  collapsed_height: 64
+  expanded_height: 300
+  click_title_to_toggle_collapse: true
+
+provider:
+  timeout_seconds: 15
+
+kimi:
+  enabled: true
+  command: "kimi-usage --json"
+
+codex:
+  enabled: true
+  mode: "auto"
+  custom_command: ""
+
+deepseek:
+  enabled: true
+  balance_url: "https://api.deepseek.com/user/balance"
+  preferred_currency: "CNY"
+  daily_snapshot_path: "data/deepseek_daily.json"
+
+security:
+  redact_secrets: true
+  log_level: "info"
