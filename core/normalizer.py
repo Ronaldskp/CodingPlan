@@ -170,7 +170,7 @@ def _merge_flat_window(
     return normalize_window(
         remaining if remaining is not None else flat("remainingPercent", "remaining_percent"),
         used if used is not None else flat("usedPercent", "used_percent", "utilization"),
-        reset if reset is not None else flat("resetAt", "resetsAt", "reset_at"),
+        reset if reset is not None else flat("resetAt", "resetsAt", "reset_at", "resets_at"),
     )
 
 
@@ -256,7 +256,7 @@ def normalize_codex_rate_limit(payload: Mapping[str, Any]) -> dict[str, Any]:
             target = next(fallback_targets, "weekly")
         result[target] = normalize_window(
             used=_lookup(window, "used_percent", "usedPercent", "utilization"),
-            reset_at=_lookup(window, "reset_at", "resetAt", "resetsAt"),
+            reset_at=_lookup(window, "reset_at", "resetAt", "resetsAt", "resets_at"),
         )
 
     if result["fiveHour"]["remainingPercent"] is None and result["weekly"]["remainingPercent"] is None:
