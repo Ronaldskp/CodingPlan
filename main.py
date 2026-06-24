@@ -11,6 +11,7 @@ from core.doctor import format_doctor, run_doctor
 from core.freshness import format_updated_with_freshness
 from core.paths import project_root
 from core.security import sanitize_message
+from core.time_display import format_reset_time
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -61,12 +62,16 @@ def format_status(usage: dict[str, Any]) -> str:
                 today_currency = str(today.get("currency") or balance.get("currency") or "CNY")
                 lines.append(f"  Today    ~ {today_currency} {float(today['estimatedSpend']):.2f}")
         else:
-            five = _percent(provider.get("fiveHour", {}))
-            week = _percent(provider.get("weekly", {}))
-            if five is not None:
-                lines.append(f"  5H    {five}%")
-            if week is not None:
-                lines.append(f"  Week  {week}%")
+            five = provider.get("fiveHour", {})
+            week = provider.get("weekly", {})
+            five_pct = _percent(five)
+            week_pct = _percent(week)
+            five_reset = format_reset_time(five.get("resetAt"))
+            week_reset = format_reset_time(week.get("resetAt"))
+            if five_pct is not None:
+                lines.append(f"  5H     {five_pct}%   reset {five_reset}")
+            if week_pct is not None:
+                lines.append(f"  Week   {week_pct}%   reset {week_reset}")
         lines.append(f"  Status {provider.get('status', 'error')}")
         message = sanitize_message(provider.get("message", ""))
         if message:
