@@ -26,6 +26,7 @@ from PySide6.QtWidgets import (
 from core.cache import read_usage, resolve_cache_path
 from core.collector import collect_usage, load_config
 from core.freshness import compute_cache_freshness, format_updated_with_freshness
+from core.time_display import format_reset_time
 from core.paths import application_icon_path, data_path, project_root as project_root_func
 from core.security import sanitize_message
 from core.ui_state import read_ui_state, write_ui_state
@@ -104,9 +105,10 @@ class ProviderCard(QFrame):
 
     def _set_quota(self, label: QLabel, prefix: str, window: dict[str, Any], status: str) -> None:
         value = window.get("remainingPercent") if isinstance(window, dict) else None
-        text = "--" if value is None else f"{value}%"
-        stale = "  stale" if value is not None and status != "ok" else ""
-        label.setText(f"{prefix:<5} {text}{stale}")
+        pct_text = "  --" if value is None else f"{value:>3}%"
+        reset = format_reset_time(window.get("resetAt")) if isinstance(window, dict) else "--"
+        stale = " stale" if value is not None and status != "ok" else ""
+        label.setText(f"{prefix:<5} {pct_text}   {reset}{stale}")
         label.setStyleSheet(f"color: {_quota_color(value, status)};")
 
 
