@@ -12,6 +12,9 @@ ui:
   collapsed_height: 64
   expanded_height: 300
   click_title_to_toggle_collapse: true
+  show_reset_times: true
+  reset_display_mode: "time"
+  compact_summary_show_reset: true
 
 provider:
   timeout_seconds: 15
