@@ -47,3 +47,13 @@ If the Codex card shows `offline` / `SSL/network error` while Kimi and DeepSeek 
 
 - Do not paste `auth.json`, Bearer tokens, or cookies into chat or logs.
 - Do not ship a real `.env` inside the release package.
+
+## Reset time shows "--"
+
+If Codex/Kimi cards show `--` for reset time:
+
+1. The provider response did not include a reset time.
+2. The reset time format could not be parsed (supported formats: ISO 8601, `MM-DD HH:MM`, `HH:MM`).
+3. The provider is offline or the value comes from stale fallback.
+
+This is normal when the provider API does not expose reset times. No action is required.

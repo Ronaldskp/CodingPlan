@@ -1,5 +1,16 @@
 # Development Log
 
+## 2026-06-24 — V1.5 Reset Time Display
+
+- 新增 `core/time_display.py`，统一解析 ISO 8601、短格式 `MM-DD HH:MM` 和时间-only `HH:MM` 的重置时间字符串。
+- `core/normalizer.py` 保留 Kimi `reset_at` 字段；Codex 支持 `reset_at`、`resetAt`、`resetsAt`、`resets_at` 字段别名。
+- `core/collector.py` 与 `config.yaml` 新增 `show_reset_times`、`reset_display_mode`、`compact_summary_show_reset` 配置项。
+- CLI `status` / `refresh` 在 Codex/Kimi 额度行末尾输出 `reset <time>`。
+- UI 展开卡片改为三列布局（类型、额度、重置时间），错误/离线保持短文案。
+- UI 折叠摘要可选显示第二行 `R C18:44 K18:44    Fresh`。
+- 新增测试：`tests/test_time_display.py`、`tests/test_reset_normalization.py`、`tests/test_ui_summary_format.py`。
+- 新增 `docs/ui_notes.md`，更新 `README.md`、`docs/development_log.md`、`docs/packaging_notes.md`、`docs/troubleshooting.md`。
+
 ## 2026-06-18 — V1 baseline
 
 - 建立 provider/core/ui 分层、统一 usage schema、原子缓存和集中脱敏。

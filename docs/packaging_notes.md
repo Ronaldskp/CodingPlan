@@ -37,6 +37,10 @@ The EXE supports the same collapse/expand and in-window refresh button as the so
 - The collapsed summary includes Fresh/Stale/Expired and shows `Refreshing...` during a background refresh.
 - Folded state and window position are saved to `data/ui_state.json`.
 
+## V1.5+ Reset Time Display
+
+V1.5 shows Codex/Kimi 5H reset times in expanded cards and the optional collapsed summary line. No packaging changes are required; `config.yaml` enables the new options by default.
+
 ## Release Layout
 
 ```text

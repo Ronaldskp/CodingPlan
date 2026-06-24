@@ -1,8 +1,20 @@
 # CodingPlanWidget
 
 CodingPlanWidget 是一个 Windows 桌面悬浮工具，用于显示 Codex、Kimi Coding Plan
-的 5H、weekly 剩余额度，以及 DeepSeek API 余额和今日估算消费。V1.4.1 保持
-Python + PySide6 以及 provider/core/ui 分层。
+的 5H、weekly 剩余额度，以及 DeepSeek API 余额和今日估算消费。V1.5 新增
+Codex/Kimi 额度重置时间显示，V1.4.1 保持 Python + PySide6 以及 provider/core/ui
+分层。
+
+## V1.5 Reset Time Display
+
+V1.5 新增 Codex/Kimi 的 5H 额度重置时间解析与显示：
+
+- CLI `status` / `refresh` 输出中，Codex 与 Kimi 的 5H / Week 行末尾显示 `reset <time>`。
+- UI 展开卡片中，每行额度右侧显示对应的重置时间；缺失或无法解析时显示 `--`。
+- 折叠摘要可选显示第二行重置时间，格式 `R C18:44 K18:44    Fresh`。
+- 新增 `ui` 配置项：`show_reset_times`、`reset_display_mode`、`compact_summary_show_reset`。
+
+详细信息见 `docs/ui_notes.md`。
 
 ## 日常启动（推荐）
 
@@ -170,7 +182,12 @@ python -m pytest
 ## 折叠与手动刷新
 
 - 点击标题栏右侧的 `˄` 按钮，或点击标题栏区域（不拖动），可将悬浮窗折叠为一行摘要。
-- 折叠后显示示例：`C 98/84  K 70/52  DS 58.23`。
+- 折叠后显示示例：
+  ```text
+  C 98/84  K 70/52  DS 58.23
+  R C18:44 K18:44    Fresh
+  ```
+  第二行仅在 `compact_summary_show_reset: true` 且有有效重置时间时显示。
 - 折叠摘要末尾显示 `Fresh`、`Stale` 或 `Expired`；刷新过程中显示 `Refreshing...`。
 - Provider 刷新失败但有旧值时，展开卡片保留旧值并在额度行标记 `stale`。
 - 再次点击同一区域恢复展开，窗口高度与位置自动恢复。
@@ -207,6 +224,21 @@ provider:
 它同时约束 Kimi/Codex 子进程以及 Codex 网络请求。超时只影响对应 provider，
 不会导致整个程序崩溃。退出时若后台刷新尚未完成，窗口立即隐藏，程序会在受 timeout
 约束的刷新结束后退出。
+
+## Reset time display config
+
+`config.yaml` 控制重置时间的显示行为：
+
+```yaml
+ui:
+  show_reset_times: true
+  reset_display_mode: "time"
+  compact_summary_show_reset: true
+```
+
+- `show_reset_times`：是否在 CLI 与 UI 中显示 Codex/Kimi 的重置时间。
+- `reset_display_mode`：目前仅支持 `"time"`（显示具体时间点）；未来可扩展为 `"countdown"`。
+- `compact_summary_show_reset`：是否在折叠摘要第二行显示 5H 重置时间。
 
 ## 安全说明
 
