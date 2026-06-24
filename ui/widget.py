@@ -391,31 +391,25 @@ class CodingPlanWidget(QWidget):
     def _update_summary(self) -> None:
         usage = read_usage(self.cache_path, create_if_missing=True)
         providers = usage.get("providers", {})
-        parts = []
-        codex = providers.get("codex", {})
-        if codex.get("status") == "ok":
-            parts.append(f"C {_summary_pct(codex.get('fiveHour'))}/{_summary_pct(codex.get('weekly'))}")
-        else:
-            parts.append("C offline")
-
-        kimi = providers.get("kimi", {})
-        if kimi.get("status") == "ok":
-            parts.append(f"K {_summary_pct(kimi.get('fiveHour'))}/{_summary_pct(kimi.get('weekly'))}")
-        else:
-            parts.append("K offline")
-
-        deepseek = providers.get("deepseek", {})
-        balance = deepseek.get("balance") or {}
-        if deepseek.get("status") == "ok" and balance.get("total") is not None:
-            parts.append(f"DS {float(balance['total']):.2f}")
-        else:
-            parts.append("DS offline")
-
+        show_reset = (
+            self.config["ui"].get("show_reset_times", True)
+            and self.config["ui"].get("compact_summary_show_reset", True)
+        )
+        text = _format_compact_summary(providers, show_reset=show_reset)
         freshness = compute_cache_freshness(
             str(usage.get("updatedAt")) if usage.get("updatedAt") else None
         )
-        parts.append(freshness.status)
-        self.summary.setText(" ".join(parts))
+        lines = text.splitlines()
+        if lines:
+            lines[-1] = f"{lines[-1]}  {freshness.status}"
+        self.summary.setText("\n".join(lines))
+        if self.collapsed and "\n" in self.summary.text():
+            new_height = max(self.collapsed_height, 78)
+            self.setFixedHeight(new_height)
+            self.resize(self.width(), new_height)
+        elif self.collapsed:
+            self.setFixedHeight(self.collapsed_height)
+            self.resize(self.width(), self.collapsed_height)
 
     def contextMenuEvent(self, event) -> None:
         menu = QMenu(self)
@@ -604,6 +598,53 @@ def _remaining_values(providers: tuple[dict[str, Any], ...]) -> list[int]:
             if isinstance(value, (int, float)):
                 values.append(round(value))
     return values
+
+
+def _format_compact_summary(providers: dict[str, Any], show_reset: bool = True) -> str:
+    codex = providers.get("codex", {})
+    kimi = providers.get("kimi", {})
+    deepseek = providers.get("deepseek", {})
+
+    def pct(window: Any) -> str:
+        if isinstance(window, dict) and window.get("remainingPercent") is not None:
+            return f"{round(window['remainingPercent'])}"
+        return "--"
+
+    def provider_summary(provider: dict[str, Any], prefix: str) -> str:
+        if provider.get("status") != "ok":
+            return f"{prefix} offline"
+        five = provider.get("fiveHour", {})
+        weekly = provider.get("weekly", {})
+        return f"{prefix} {pct(five)}/{pct(weekly)}"
+
+    parts = [
+        provider_summary(codex, "C"),
+        provider_summary(kimi, "K"),
+    ]
+
+    balance = deepseek.get("balance") or {}
+    if deepseek.get("status") == "ok" and balance.get("total") is not None:
+        parts.append(f"DS {float(balance['total']):.2f}")
+    else:
+        parts.append("DS offline")
+
+    summary = "  ".join(parts)
+
+    if not show_reset:
+        return summary
+
+    reset_parts = []
+    for label, provider in (("C", codex), ("K", kimi)):
+        if provider.get("status") != "ok":
+            continue
+        five = provider.get("fiveHour", {})
+        if isinstance(five, dict):
+            reset = format_reset_time(five.get("resetAt"))
+            if reset != "--":
+                reset_parts.append(f"{label}{reset}")
+    if not reset_parts:
+        return summary
+    return f"{summary}\nR {' '.join(reset_parts)}"
 
 
 def _summary_pct(window: Any) -> str:
