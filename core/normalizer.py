@@ -208,7 +208,7 @@ def normalize_kimi_cli(payload: Mapping[str, Any]) -> dict[str, Any]:
             used_pct = _number(item.get("used"))
         remaining_pct = _number(item.get("remaining"))
         reset_at = item.get("reset_at")
-        if used_pct is None or remaining_pct is None or reset_at in (None, ""):
+        if used_pct is None or remaining_pct is None:
             invalid_targets.append(label)
             continue
         result[target] = normalize_window(
